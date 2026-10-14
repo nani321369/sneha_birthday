@@ -69,6 +69,17 @@ h2{font-size:2rem;margin-bottom:8px;color:var(--wine)}
 .gone{pointer-events:none;animation:vanish 1.1s ease-in forwards}
 @keyframes vanish{0%{opacity:1;transform:scale(1)}60%{opacity:.6;transform:scale(1.05) translateY(-10px)}100%{opacity:0;transform:scale(.6) translateY(-60px)}}
 .note.done{font-family:Caveat,cursive;font-size:1.6rem;color:var(--wine)}
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:radial-gradient(circle at 15% 10%,rgba(217,102,127,.16),transparent 45%),radial-gradient(circle at 85% 85%,rgba(242,193,78,.14),transparent 45%)}
+.bg span{position:absolute}
+.star{animation:twinkle 3s ease-in-out infinite;will-change:transform,opacity}
+.spk{opacity:0;animation:spk 6s ease-in-out infinite;will-change:transform,opacity}
+.bln{bottom:-120px;width:44px;height:56px;border-radius:50% 50% 48% 48%;opacity:.55;background-image:radial-gradient(circle at 35% 30%,rgba(255,255,255,.55),rgba(255,255,255,0) 40%),radial-gradient(circle at 70% 80%,rgba(0,0,0,.15),rgba(0,0,0,0) 55%);animation:drift 28s linear infinite;will-change:transform}
+.bln::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:40px;background:rgba(120,70,80,.45)}
+main{position:relative;z-index:1}
+@keyframes twinkle{0%,100%{opacity:.15;transform:scale(.6)}50%{opacity:.85;transform:scale(1.15)}}
+@keyframes spk{0%,100%{opacity:0;transform:translateY(0) scale(.6) rotate(0)}50%{opacity:.8;transform:translateY(-14px) scale(1) rotate(25deg)}}
+@keyframes drift{0%{transform:translate(0,0) scale(var(--s))}50%{transform:translate(var(--dx),-60vh) scale(var(--s))}100%{transform:translate(0,-125vh) scale(var(--s))}}
+@media (prefers-reduced-motion:reduce){.bg span{animation:none;opacity:.5}.bln{display:none}}
 .game{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
 .note-card{flex:1 1 220px;background:var(--card);border:2px dashed var(--line);border-radius:16px;padding:18px 20px;transform:rotate(-1.5deg)}
 .note-card h3{font-family:Fraunces,Georgia,serif;font-size:1.1rem;color:var(--wine);margin:0 0 6px}
@@ -89,6 +100,7 @@ textarea{width:100%;min-height:110px;border:2px solid var(--line);border-radius:
 </head>
 <body>
 <button id="open"><span style="font-size:3.5rem">🎂</span>A little something for Sneha<small style="font-family:Nunito,sans-serif;font-size:1rem;color:var(--muted)">Tap to open</small></button>
+<div class="bg" id="bg" aria-hidden="true"></div>
 <canvas id="fx"></canvas>
 <main>
 <div class="top"><span>For my best friend · 15 October</span></div>
@@ -182,6 +194,13 @@ function burst(){
 document.getElementById('cake').onclick=()=>burst();
 
 // photos: float in as they scroll into view; tap one to bring it forward
+// background decorations: stars, balloons and sparkles
+const bg=document.getElementById('bg'),R=Math.random,cl=['#d9667f','#f2c14e','#f4b6c2','#8fd3c8','#b79cf0','#721d36'];
+const add=(c,st,txt)=>{const e=document.createElement('span');e.className=c;e.style.cssText=st;if(txt)e.textContent=txt;bg.appendChild(e)};
+for(let i=0;i<26;i++)add('star',`left:${R()*100}%;top:${R()*100}%;font-size:${8+R()*14}px;color:${cl[i%5]};animation-delay:${-R()*5}s;animation-duration:${2.5+R()*3}s`,['✦','✧','⋆','✦'][i%4]);
+for(let i=0;i<9;i++)add('bln',`left:${5+R()*88}%;background-color:${cl[i%6]};animation-duration:${22+R()*18}s;animation-delay:${-R()*30}s;--s:${.6+R()*.7};--dx:${(R()-.5)*90}px`);
+for(let i=0;i<8;i++)add('spk',`left:${R()*100}%;top:${R()*100}%;font-size:${14+R()*10}px;animation-delay:${-R()*6}s;animation-duration:${5+R()*4}s`,['✨','🎉','💫','🎊'][i%4]);
+
 const fs=[...document.querySelectorAll('.f')];
 const vio=new IntersectionObserver(es=>es.forEach(x=>x.target.classList.toggle('vis',x.isIntersecting)),{rootMargin:'100px'});
 fs.forEach(f=>vio.observe(f));
